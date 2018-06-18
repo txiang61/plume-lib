@@ -2662,7 +2662,11 @@ public final class UtilMDE {
             if ((ch < '0') || (ch > '8')) {
               break;
             }
-            octal_char = (char) ((octal_char * 8) + Character.digit(ch, 8));
+            /* cast warning is suppressed here because It's not possible for Character.digit to return -1
+            as `ch` is within the radix range */
+	        @SuppressWarnings("cast")
+	        char octal_char_cast = (char) ((octal_char * 8) + Character.digit(ch, 8));
+	        octal_char = octal_char_cast;
           }
           sb.append(octal_char);
           post_esc = ii - 1;
