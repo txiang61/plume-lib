@@ -45,6 +45,7 @@ This is good for modes like Perl, where the parser can get confused."
 ;; (use-maven-compilation-error-regexp)
 (defun use-maven-compilation-error-regexp ()
   (interactive)
+  (require 'compile)
   (add-to-list 'compilation-error-regexp-alist 'maven))
 
 
@@ -1587,14 +1588,15 @@ Use as a hook, like so:
 
         ;; end of Checker Framework demos
 	;; General Checker Framework rule
-        ((string-match "/\\(checker\\|framework\\)/tests/\\([^/]*\\)/" default-directory)
-         (let ((dir (match-string 2 default-directory)))
-           (if (equal dir "src")
-               (setq dir "all"))
-           (setq dir (replace-regexp-in-string "_" "-" dir))
-	   (setq dir (replace-regexp-in-string "flow2" "flow" dir))
+        ((string-match "\\(^.*\\)/\\(?:checker\\|framework\\)/tests/\\([^/]*\\)/" default-directory)
+         (let ((cf-dir (match-string 1 default-directory))
+	       (base-dir (match-string 2 default-directory)))
+           (if (equal base-dir "src")
+               (setq base-dir "all"))
+           (setq base-dir (replace-regexp-in-string "_" "-" base-dir))
+	   (setq base-dir (replace-regexp-in-string "flow2" "flow" base-dir))
            (make-local-variable 'compile-command)
-           (setq compile-command (concat "ant -e -find build.xml " dir "-tests"))))
+           (setq compile-command (concat "gradle -p " cf-dir " " (capitalize base-dir) "Test"))))
 
         ((string-match "/bzr/.*/doc/en/user-guide/" default-directory)
          (make-local-variable 'compile-command)
